@@ -25,7 +25,7 @@
   };
 
   let translations_req = await fetch(
-    "https://raw.githubusercontent.com/SheriffCarry/KirkaScripts/main/ConsoleScripts/microwaves.json",
+    "https://raw.githubusercontent.com/SheriffCarry-backup/KirkaScripts/main/ConsoleScripts/microwaves.json",
   );
   let translations = await translations_req.json();
 
