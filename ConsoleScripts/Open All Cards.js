@@ -55,7 +55,7 @@
       "If you only want a specific chest to be opened, just delete the chest from the array at the top of the script",
     );
     console.log(
-      "https://github.com/SheriffCarry/KirkaScripts/blob/main/ConsoleScripts/OpenAllCards_live_updating.js this code is live updatin",
+      "https://github.com/SheriffCarry-backup/KirkaScripts/blob/main/ConsoleScripts/OpenAllCards_live_updating.js this code is live updatin",
     );
   }
 
