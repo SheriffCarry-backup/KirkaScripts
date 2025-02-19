@@ -1,15 +1,25 @@
 (async () => {
+  let git_base = "SheriffCarry-backup";
   //Chest Open delay
   let openingdelay = 2000; //2000 = 2.0s, make it higher to be more safe. (Recently some people have experienced issues with opening chests... Higher delay could fix it)
   let chests;
-  //Delete the row of the chests, you don't want to get opened
+  //Delete the row of the chest, you don't want to get opened
   try {
     chests = customchestlist;
   } catch {
     chests = [
-      { chestid: "077a4cf2-7b76-4624-8be6-4a7316cf5906", name: "Golden" },
-      { chestid: "ec230bdb-4b96-42c3-8bd0-65d204a153fc", name: "Ice" },
-      { chestid: "71182187-109c-40c9-94f6-22dbb60d70ee", name: "Wood" },
+      {
+        chestid: "077a4cf2-7b76-4624-8be6-4a7316cf5906",
+        name: "Golden",
+      },
+      {
+        chestid: "ec230bdb-4b96-42c3-8bd0-65d204a153fc",
+        name: "Ice",
+      },
+      {
+        chestid: "71182187-109c-40c9-94f6-22dbb60d70ee",
+        name: "Wood",
+      },
     ];
   }
 
@@ -23,7 +33,7 @@
   };
 
   let translations_req = await fetch(
-    "https://raw.githubusercontent.com/SheriffCarry-backup/KirkaScripts/main/ConsoleScripts/microwaves.json",
+    `https://raw.githubusercontent.com/${git_base}/KirkaScripts/main/ConsoleScripts/microwaves.json`
   );
   let translations = await translations_req.json();
 
@@ -47,13 +57,13 @@
   function logCredits() {
     console.log(
       "%cMade by carrysheriff/SheriffCarry discord: @carrysheriff",
-      "color: #000000;background-color: #FFFFFF;font-size: large;",
+      "color: #000000;background-color: #FFFFFF;font-size: large;"
     );
     console.log(
-      "If you only want a specific chest to be opened, just delete the chest from the array at the top of the script",
+      "If you only want a specific chest to be opened, just delete the chest from the array at the top of the script"
     );
     console.log(
-      "https://github.com/SheriffCarry/KirkaScripts-backup/blob/main/ConsoleScripts/OpenAllChests_live_updating.js this code is live updatin",
+      `https://github.com/${git_base}/KirkaScripts/blob/main/ConsoleScripts/OpenAllChests_live_updating.js this code is live updating`
     );
   }
 
@@ -66,16 +76,44 @@
           accept: "application/json",
           authorization: `Bearer ${localStorage.token}`,
         },
-      },
+      }
     );
     let json = await response.json();
     return json;
   }
 
+  let bvl = [];
+
+  async function setBVL() {
+    let response = await fetch(
+      "https://opensheet.elk.sh/1tzHjKpu2gYlHoCePjp6bFbKBGvZpwDjiRzT9ZUfNwbY/Alphabetical"
+    );
+    bvl = await response.json();
+    return;
+  }
+
+  function rarity_backup(spreadsheet, namefield, rarityfield, skinname) {
+    let found = false;
+    let rarity = "Unknown-Rarity";
+    spreadsheet.forEach((listitem) => {
+      if (listitem && listitem[namefield] && listitem[rarityfield]) {
+        if (
+          found == false &&
+          listitem[namefield] == skinname &&
+          Object.keys(coloroutput).includes(listitem[rarityfield].toUpperCase())
+        ) {
+          found = true;
+          rarity = listitem[rarityfield];
+        }
+      }
+    });
+    return rarity;
+  }
+
   //this code opens chests
-  async function openChest(chestid) {
+  async function openChest(chestId) {
     let bodyobj = {};
-    bodyobj[translations["id"]] = chestid;
+    bodyobj[translations["id"]] = chestId;
     const response = await fetch(
       `https://api2.kirka.io/api/${translations["inventory"]}/${translations["openChest"]}`,
       {
@@ -86,10 +124,9 @@
           "content-type": "application/json;charset=UTF-8",
         },
         body: JSON.stringify(bodyobj),
-      },
+      }
     );
-    let json = await response.json();
-    return json;
+    return await response.json();
   }
 
   function ingameShowcase_messages(message, displaylength) {
@@ -138,17 +175,21 @@
   function ingameShowcase(message, rarity, name) {
     rarity = translations[rarity];
     if (rarity == undefined) {
-      return;
+      rarity = rarity_backup(bvl, "Skin Name", "Rarity", name);
     }
     const text = `${rarity} ${message} from: ${name}`;
-    const style = `color: #${coloroutput[rarity] || coloroutput.DEFAULT}`;
+    const style = `color: #${
+      coloroutput[rarity.toUpperCase()] || coloroutput.DEFAULT
+    }`;
     console.log(`%c${text}`, style);
 
     const elem = document.createElement("div");
     elem.classList.add("vue-notification-wrapper");
     elem.style =
       "transition-timing-function: ease; transition-delay: 0s; transition-property: all;";
-    elem.innerHTML = `<div data-v-3462d80a="" data-v-460e7e47="" class="alert-default"><span data-v-3462d80a="" class="text" style="color:#${coloroutput[rarity] || coloroutput.DEFAULT}">${text}</span></div>`;
+    elem.innerHTML = `<div data-v-3462d80a="" data-v-460e7e47="" class="alert-default"><span data-v-3462d80a="" class="text" style="color:#${
+      coloroutput[rarity.toUpperCase()] || coloroutput.DEFAULT
+    }">${text}</span></div>`;
     elem.onclick = function () {
       try {
         elem.remove();
@@ -192,13 +233,19 @@
       confetti({
         ...defaults,
         particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        origin: {
+          x: randomInRange(0.1, 0.3),
+          y: Math.random() - 0.2,
+        },
         zIndex: 99999,
       });
       confetti({
         ...defaults,
         particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        origin: {
+          x: randomInRange(0.7, 0.9),
+          y: Math.random() - 0.2,
+        },
         zIndex: 99999,
       });
     }, 250);
@@ -250,7 +297,7 @@
           item[translations["item"]][key] ==
             "6be53225-952a-45d7-a862-d69290e4348e"
         ) {
-          translations["newid"] = key;
+          translations["id"] = key;
         }
       });
     });
@@ -286,9 +333,9 @@
     if (!chests[0]) {
       return;
     }
+    await setBVL();
     let inventory = await fetchInventory();
     automatic_microwaves(inventory);
-    console.log(translations);
 
     chestskipper = processChestskipper(chestskipper, inventory);
 
@@ -303,16 +350,12 @@
     let counter = 0;
     let interval = setInterval(async () => {
       let chestresult = await openChest(chests[counter]["chestid"]);
-      let resultRarity = chestresult[translations["rarity"]];
       let resultName = chestresult[translations["name"]];
-      if (resultRarity) {
-        if (Object.keys(coloroutput).includes(translations[resultRarity])) {
-          ingameShowcase(resultName, resultRarity, chests[counter]["name"]);
-          if (translations[resultRarity] == "MYTHICAL") {
-            confettiAnimation();
-          }
-        } else {
-          console.log(`${resultRarity} ${resultName}`);
+      let resultRarity = chestresult[translations["rarity"]];
+      if (resultName) {
+        ingameShowcase(resultName, resultRarity, chests[counter]["name"]);
+        if (translations[resultRarity] == "MYTHICAL") {
+          confettiAnimation();
         }
       } else if (chestresult["code"] == 9910) {
         console.log("RATELIMIT");
