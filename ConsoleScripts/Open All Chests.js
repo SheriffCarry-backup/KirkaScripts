@@ -1,5 +1,5 @@
 (async () => {
-  let git_base = "SheriffCarry";
+  let git_base = "SheriffCarry-backup";
   //Chest Open delay
   let openingdelay = 2000; //2000 = 2.0s, make it higher to be more safe. (Recently some people have experienced issues with opening chests... Higher delay could fix it)
   let chests;
